@@ -1,0 +1,28 @@
+{
+  "name": "repository-context-packager",
+  "version": "0.1.0",
+  "description": "CLI tool that analyzes local git repositories and creates a text file containing repository content optimized for sharing with LLMs.",
+  "bin": {
+    "repomaster": "bin/repomaster.js"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node bin/repomaster"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AubreyDDD/Repository-Context-Packager.git"
+  },
+  "keywords": [],
+  "author": "Aubrey Du",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/AubreyDDD/Repository-Context-Packager/issues"
+  },
+  "homepage": "https://github.com/AubreyDDD/Repository-Context-Packager#readme",
+  "dependencies": {
+    "commander": "^14.0.0"
+  }
+}
