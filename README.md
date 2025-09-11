@@ -38,7 +38,7 @@ repomaster -V
 repomaster -h
 ```
 
-## 📂 Example Output
+## Example Output
 
 ```bash
 # Repository Context
@@ -69,10 +69,10 @@ package.json
 ## File Contents
 
 ### File: src/cli.js
-
+```
 import { Command } from 'commander';
 
-
+```
 ## Summary
 - Total files: 11
 - Total lines: 619
