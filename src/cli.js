@@ -1,9 +1,15 @@
 import { Command } from 'commander';
-import fs from 'node:fs'; // check exists, read files
-import path from 'node:path'; // convert to absolute
-import { execFileSync } from 'node:child_process'; // git commands
+import fs from 'node:fs'; 
+import path from 'node:path';
+
+
+import { getGitInfoOrNull } from './git.js';
+import { collectFiles } from './walk.js';
+import { buildTree, renderTree } from './tree.js';
+import { readFilesAndSummarize } from './io.js';
 
 const program = new Command();
+
 
 program
   .name('repomaster')
@@ -22,7 +28,7 @@ program
         baseDir = st.isDirectory() ? absPaths[0] : path.dirname(absPaths[0]);
       } catch {
         console.error(`Error: Path does not exist - ${absPaths[0]}`);
-        //baseDir = process.cwd();
+        baseDir = process.cwd();
       }
 
       // get git info if possible
@@ -38,6 +44,19 @@ program
         : '- Not a git repository';
     
     
+    const filesAbs = collectFiles(absPaths);
+
+       // get directory tree text
+      const filesRel = filesAbs
+        .map(f => path.relative(baseDir, f))
+        .filter(rel => rel && !rel.startsWith('..') && !path.isAbsolute(rel));
+      const treeText = filesRel.length
+        ? renderTree(buildTree(filesRel))
+        : '(empty)';
+
+     // read files and summarize
+      const { sections, stats } = readFilesAndSummarize(filesAbs, baseDir);
+
     // basic output template
     const out = [
       '# Repository Context',
@@ -50,15 +69,15 @@ program
       '',
       '## Structure',
       '```',
-      '',
+      treeText,
       '```',
       '',
       '## File Contents',
-      '',
+      sections.join('\n'),
       '',
       '## Summary',
-      '- Total files: ',
-      '- Total lines: ',
+      `- Total files: ${stats.totalTextFiles}`,
+      `- Total lines: ${stats.totalLines}`,
       ''
     ].join('\n');
 
@@ -67,25 +86,5 @@ program
 
  // async parse to allow for future async actions
 program.parseAsync(process.argv);
-
-/* -------- helpers -------- */
-
-// get git info
-function getGitInfoOrNull(baseDir) {
-  try {
-    const run = (args) => execFileSync('git', args, { cwd: baseDir }).toString().trim();
-
-    const commit = run(['rev-parse', 'HEAD']);
-    const branch = run(['rev-parse', '--abbrev-ref', 'HEAD']);
-    const authorName  = run(['show', '-s', '--format=%an', 'HEAD']);
-    const authorEmail = run(['show', '-s', '--format=%ae', 'HEAD']);
-    const date   = run(['show', '-s', '--format=%cd', 'HEAD']);
-
-   const author = `${authorName} <${authorEmail}>`;
-    return { commit, branch, author, date };
-  } catch {
-    return null; 
-  }
-}
 
 
