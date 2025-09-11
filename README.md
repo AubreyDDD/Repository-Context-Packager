@@ -69,10 +69,10 @@ package.json
 ## File Contents
 
 ### File: src/cli.js
-```
+
 import { Command } from 'commander';
 
-```
+
 ## Summary
 - Total files: 11
 - Total lines: 619
