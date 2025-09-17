@@ -9,6 +9,13 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
 - File contents (with headers & truncation for large files)
 - Summary statistics (total files and total lines)
 
+## Features
+
+- **Gitignore Integration**: Automatically exclude files and directories listed in .gitignore
+- **Flexible Output**: Output to stdout or save to a file (.txt, .md, or any extension)
+- **Smart File Handling**: Automatically detects and skips binary files
+- **Customizable Scope**: Process entire directories or specific files
+
 ## Installation
 
 Clone the repository and install globally with `npm`:
@@ -20,10 +27,13 @@ npm install
 npm link
 ```
 
-## Usage
+## Example Usage
 ```bash
-# Package the current directory
+# Package the current directory, Use .gitignore by default (exclude ignored files)
 repomaster .
+
+# Include all files, ignore .gitignore rules  
+repomaster . --no-gitignore
 
 # Package a specific repo directory
 repomaster /path/to/my-project
@@ -34,6 +44,9 @@ repomaster src/cli.js bin/repomaster.js
 # Package with output file
 repomaster . -o output.txt
 repomaster . --output output.md
+
+# Combine multiple options
+repomaster . --no-gitignore -o output.md
 
 # Show version
 repomaster -V

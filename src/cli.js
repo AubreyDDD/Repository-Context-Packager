@@ -17,6 +17,7 @@ program
   .version('0.1.0')   // --version / -V
   .argument('<paths...>', 'one or more files/directories (use . for current)') // receive 1+ paths
   .option('-o, --output <file>', 'output to a file instead of stdout')
+  .option('--no-gitignore', 'do not use .gitignore rules (include all files)')
   .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));
@@ -45,7 +46,7 @@ program
         : '- Not a git repository';
     
     
-    const filesAbs = collectFiles(absPaths);
+    const filesAbs = collectFiles(absPaths, options.gitignore);
     
     // If no valid files were found, exit with error
     if (filesAbs.length === 0) {
