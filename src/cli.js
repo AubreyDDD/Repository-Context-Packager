@@ -28,7 +28,7 @@ program
         baseDir = st.isDirectory() ? absPaths[0] : path.dirname(absPaths[0]);
       } catch {
         console.error(`Error: Path does not exist - ${absPaths[0]}`);
-        baseDir = process.cwd();
+        process.exit(1);  // Exit with error code 1 when path doesn't exist
       }
 
       // get git info if possible
@@ -45,6 +45,12 @@ program
     
     
     const filesAbs = collectFiles(absPaths);
+    
+    // If no valid files were found, exit with error
+    if (filesAbs.length === 0) {
+      // Error messages have already been printed by collectFiles
+      process.exit(1);
+    }
 
        // get directory tree text
       const filesRel = filesAbs

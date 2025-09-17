@@ -1,8 +1,8 @@
 
-import fs from 'node:fs';     // Node.js tool for reading files
-import path from 'node:path'; // Node.js tool for working with file paths
+import fs from 'node:fs';    
+import path from 'node:path'; 
 
-// Maximum size of files we'll read completely (16KB = 16,384 bytes)
+
 const MAX_FILE_SIZE = 16 * 1024;
 
 // Function that tries to detect if a file contains binary data (not human-readable text)
