@@ -1,6 +1,6 @@
 import fs from 'node:fs';     
 import path from 'node:path'; 
-import { findNearestGitignore, shouldIgnore } from './gitignore.js';
+import { findNearestGitignore, shouldIgnore } from './gitignore-handler.js';
 
 // skip .git and node_modules directories
 const DEFAULT_EXCLUDED_DIRS = new Set(['.git', 'node_modules']);
@@ -19,10 +19,6 @@ export function collectFiles(absInputs, useGitignore = true) {
       ? absInputs[0] 
       : path.dirname(absInputs[0]);
     gitignoreInfo = findNearestGitignore(startDir);
-    
-    if (gitignoreInfo) {
-      console.error(`[info] Using .gitignore from: ${gitignoreInfo.gitignoreDir}`);
-    }
   }
 
   // Go through each input path the user provided
