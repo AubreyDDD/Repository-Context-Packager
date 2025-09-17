@@ -31,11 +31,17 @@ repomaster /path/to/my-project
 # Package specific files
 repomaster src/cli.js bin/repomaster.js
 
+# Package with output file
+repomaster . -o output.txt
+repomaster . --output output.md
+
 # Show version
 repomaster -V
+repomaster --version
 
 # Show help
 repomaster -h
+repomaster --help
 ```
 
 ## Example Output

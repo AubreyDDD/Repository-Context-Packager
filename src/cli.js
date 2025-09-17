@@ -16,7 +16,8 @@ program
   .description('Repository Context Packager - package repo context for LLMs')
   .version('0.1.0')   // --version / -V
   .argument('<paths...>', 'one or more files/directories (use . for current)') // receive 1+ paths
-  .action((paths) => {
+  .option('-o, --output <file>', 'output to a file instead of stdout')
+  .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));
 
@@ -87,7 +88,18 @@ program
       ''
     ].join('\n');
 
-    process.stdout.write(out);
+    // Output to file or stdout based on options
+    if (options.output) {
+      try {
+        fs.writeFileSync(options.output, out, 'utf8');
+        console.log(`Output written to: ${options.output}`);
+      } catch (error) {
+        console.error(`Error writing to file ${options.output}: ${error.message}`);
+        process.exit(1);
+      }
+    } else {
+      process.stdout.write(out);
+    }
   });
 
  // async parse to allow for future async actions
