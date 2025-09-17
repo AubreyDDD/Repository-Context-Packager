@@ -1,15 +1,12 @@
 import { Command } from 'commander';
 import fs from 'node:fs'; 
 import path from 'node:path';
-
-
 import { getGitInfoOrNull } from './git-info.js';
 import { collectFiles } from './file-scanner.js';
 import { buildTree, renderTree } from './tree-builder.js';
 import { readFilesAndSummarize } from './content-handler.js';
 
 const program = new Command();
-
 
 program
   .name('repomaster')

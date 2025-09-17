@@ -1,4 +1,3 @@
-// src/git.js
 import { execFileSync } from 'node:child_process';
 
 // Function to get Git information (commit, branch, author, date) for a given directory

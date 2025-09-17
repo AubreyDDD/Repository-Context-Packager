@@ -1,9 +1,58 @@
-
 import fs from 'node:fs';    
 import path from 'node:path'; 
 
-
 const MAX_FILE_SIZE = 16 * 1024;
+
+// Map common file extensions to language identifiers for syntax highlighting
+const LANGUAGE_MAP = {
+  // JavaScript/TypeScript
+  '.js': 'javascript',
+  '.jsx': 'javascript', 
+  '.ts': 'typescript',
+  '.tsx': 'typescript',
+  
+  // Web
+  '.html': 'html',
+  '.css': 'css',
+  
+  // Data formats
+  '.json': 'json',
+  '.yaml': 'yaml',
+  '.yml': 'yaml',
+  
+  // Popular programming languages
+  '.py': 'python',
+  '.java': 'java',
+  '.c': 'c',
+  '.cpp': 'cpp',
+  '.cs': 'csharp',
+  '.php': 'php',
+  '.go': 'go',
+  
+  // Shell & scripts
+  '.sh': 'bash',
+  
+  // Documentation
+  '.md': 'markdown',
+  
+  // Database
+  '.sql': 'sql'
+};
+
+// Function to get language identifier from file path
+function getLanguageFromPath(filePath) {
+  const basename = path.basename(filePath).toLowerCase();
+  
+  // Handle special files
+  if (basename === 'package.json') return 'json';
+  if (basename === 'dockerfile') return 'dockerfile';
+  
+  // Get file extension
+  const ext = path.extname(filePath).toLowerCase();
+  
+  // Return mapped language or use extension without dot as fallback
+  return LANGUAGE_MAP[ext] || ext.slice(1);
+}
 
 // Function that tries to detect if a file contains binary data (not human-readable text)
 // Binary files include images, videos, executable programs, etc.
@@ -29,11 +78,11 @@ export function isLikelyBinary(buf) {
 }
 
 // Function that formats a file's content into a nice section for the final output
-// Creates a header with the file path and wraps the content in code blocks
-export function renderFileSection(relPath, content, truncated) {
+// Creates a header with the file path and wraps the content in code blocks with syntax highlighting
+export function renderFileSection(relPath, content, truncated, language = '') {
   return [
     `\n### File: ${relPath}\n`,
-    '```',
+    `\`\`\`${language}`,
     content,
     '```',
     truncated ? '\n> [truncated]\n' : ''
@@ -85,6 +134,9 @@ export function readFilesAndSummarize(filesAbs, baseDir) {
 
     const rel = path.relative(baseDir, fileAbs) || path.basename(fileAbs);
     
+    // Get the language type for syntax highlighting
+    const language = getLanguageFromPath(fileAbs);
+    
     // Count how many lines are in this file (split by line breaks)
     const lineCount = content.split(/\r?\n/).length;
 
@@ -92,7 +144,7 @@ export function readFilesAndSummarize(filesAbs, baseDir) {
     totalLines += lineCount;
 
     // Create a formatted section for this file and add it to our collection
-    sections.push(renderFileSection(rel, content, truncated));
+    sections.push(renderFileSection(rel, content, truncated, language));
   }
 
   // Return both the formatted content sections and the statistics
