@@ -16,7 +16,7 @@ program
   .argument('<paths...>', 'one or more files/directories (use . for current)') // receive 1+ paths
   .option('-o, --output <file>', 'output to a file instead of stdout')
   .option('--no-gitignore', 'do not use .gitignore rules (include all files)')
-  .option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory')
+  .option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory. \n-r(default 7days), -r [days] could show custom days')
   .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));
