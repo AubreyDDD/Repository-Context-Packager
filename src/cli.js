@@ -1,10 +1,11 @@
 import { Command } from 'commander';
-import fs from 'node:fs'; 
+import fs, { fstatSync } from 'node:fs'; 
 import path from 'node:path';
 import { getGitInfoOrNull } from './git-info.js';
 import { collectFiles } from './file-scanner.js';
 import { buildTree, renderTree } from './tree-builder.js';
 import { readFilesAndSummarize } from './content-handler.js';
+import { isBooleanObject } from 'node:util/types';
 
 const program = new Command();
 
@@ -15,6 +16,7 @@ program
   .argument('<paths...>', 'one or more files/directories (use . for current)') // receive 1+ paths
   .option('-o, --output <file>', 'output to a file instead of stdout')
   .option('--no-gitignore', 'do not use .gitignore rules (include all files)')
+  .option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory')
   .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));
@@ -43,13 +45,22 @@ program
         : '- Not a git repository';
     
     
-    const filesAbs = collectFiles(absPaths, options.gitignore);
+    let filesAbs = collectFiles(absPaths, options.gitignore);
     
     // If no valid files were found, exit with error
     if (filesAbs.length === 0) {
       // Error messages have already been printed by collectFiles
       process.exit(1);
     }
+      // filter by recent if specified
+      if(options.recent){
+        options.recent = isBooleanObject(options.recent) ? 7 : parseInt(options.recent,10) || 7; // default to 7 days if no number provided
+        filesAbs = filesAbs.filter(filePath=>{
+          const fstat = fs.statSync(filePath);
+          fstat.mtimeMs = fstat.mtimeMs || fstat.ctimeMs || 0; // fallback to ctime if mtime is unavailable
+          return fstat.mtimeMs > Date.now() - options.recent * 24 * 60 * 60 * 1000;
+        });
+      }
 
        // get directory tree text
       const filesRel = filesAbs
