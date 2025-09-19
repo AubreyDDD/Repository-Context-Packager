@@ -55,6 +55,14 @@ repomaster --version
 # Show help
 repomaster -h
 repomaster --help
+
+# list recent modified files (within last 7 days) only
+repomaster . -r
+repomaster . --recent
+
+# list recent modified files (within last N days) only
+repomaster . -r 14
+repomaster . --recent 30
 ```
 
 ## Example Output
