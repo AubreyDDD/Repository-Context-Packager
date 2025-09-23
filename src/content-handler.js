@@ -79,11 +79,20 @@ export function isLikelyBinary(buf) {
 
 // Function that formats a file's content into a nice section for the final output
 // Creates a header with the file path and wraps the content in code blocks with syntax highlighting
-export function renderFileSection(relPath, content, truncated, language = '') {
+export function renderFileSection(relPath, content, truncated, language = '', withLineNumbers = false) {
+  let formattedContent = content;
+  
+  if (withLineNumbers) {
+    const lines = content.split(/\r?\n/);
+    formattedContent = lines
+      .map((line, index) => `${(index + 1).toString()}: ${line}`)
+      .join('\n');
+  }
+  
   return [
     `\n### File: ${relPath}\n`,
     `\`\`\`${language}`,
-    content,
+    formattedContent,
     '```',
     truncated ? '\n> [truncated]\n' : ''
   ].join('\n');
@@ -94,7 +103,7 @@ export function renderFileSection(relPath, content, truncated, language = '') {
  * This function goes through each file, reads its content, and prepares it for the final output
  * It also keeps track of various statistics like how many files were processed
  */
-export function readFilesAndSummarize(filesAbs, baseDir) {
+export function readFilesAndSummarize(filesAbs, baseDir, withLineNumbers = false) {
   let totalTextFiles = 0;
   let totalLines = 0;
   let skippedBinary = 0;
@@ -144,7 +153,7 @@ export function readFilesAndSummarize(filesAbs, baseDir) {
     totalLines += lineCount;
 
     // Create a formatted section for this file and add it to our collection
-    sections.push(renderFileSection(rel, content, truncated, language));
+    sections.push(renderFileSection(rel, content, truncated, language, withLineNumbers));
   }
 
   // Return both the formatted content sections and the statistics

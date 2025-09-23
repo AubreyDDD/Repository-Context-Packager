@@ -17,6 +17,7 @@ program
   .option('-o, --output <file>', 'output to a file instead of stdout')
   .option('--no-gitignore', 'do not use .gitignore rules (include all files)')
   .option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory. \n-r(default 7days), -r [days] could show custom days')
+  .option('-l, --line-numbers', 'include line numbers in file content output')
   .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));
@@ -71,7 +72,7 @@ program
         : '(empty)';
 
      // read files and summarize
-      const { sections, stats } = readFilesAndSummarize(filesAbs, baseDir);
+      const { sections, stats } = readFilesAndSummarize(filesAbs, baseDir, options.lineNumbers);
 
     // basic output template
     const out = [
