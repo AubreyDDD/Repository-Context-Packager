@@ -15,6 +15,7 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
 - **Flexible Output**: Output to stdout or save to a file (.txt, .md, or any extension)
 - **Smart File Handling**: Automatically detects and skips binary files
 - **Customizable Scope**: Process entire directories or specific files
+- **Content Search**: Filter files by content using regex patterns with `--grep`
 
 ## Installation
 
@@ -63,6 +64,10 @@ repomaster . --recent
 # list recent modified files (within last N days) only
 repomaster . -r 14
 repomaster . --recent 30
+
+# Filter files by content pattern (case-insensitive regex search)
+repomaster . --grep "Command"
+repomaster . --grep "import.*React"
 ```
 
 ## Example Output

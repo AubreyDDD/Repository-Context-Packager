@@ -1,10 +1,10 @@
 import { Command } from 'commander';
-import fs, { fstatSync } from 'node:fs'; 
+import fs from 'node:fs'; 
 import path from 'node:path';
 import { getGitInfoOrNull } from './git-info.js';
 import { collectFiles } from './file-scanner.js';
 import { buildTree, renderTree } from './tree-builder.js';
-import { readFilesAndSummarize } from './content-handler.js';
+import { readFilesAndSummarize, isLikelyBinary } from './content-handler.js';
 import { isBooleanObject } from 'node:util/types';
 
 const program = new Command();
@@ -17,6 +17,7 @@ program
   .option('-o, --output <file>', 'output to a file instead of stdout')
   .option('--no-gitignore', 'do not use .gitignore rules (include all files)')
   .option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory. \n-r(default 7days), -r [days] could show custom days')
+  .option('--grep <pattern>', 'only include files containing the specified pattern')
   .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));
@@ -59,6 +60,26 @@ program
           const fstat = fs.statSync(filePath);
           fstat.mtimeMs = fstat.mtimeMs || fstat.ctimeMs || 0; // fallback to ctime if mtime is unavailable
           return fstat.mtimeMs > Date.now() - options.recent * 24 * 60 * 60 * 1000;
+        });
+      }
+
+      // filter by content pattern if specified
+      if (options.grep) {
+        const pattern = new RegExp(options.grep, 'i'); // case-insensitive search
+        filesAbs = filesAbs.filter(filePath => {
+          try {
+            const buf = fs.readFileSync(filePath);
+            // Skip binary files for content search
+            if (isLikelyBinary(buf)) {
+              return false;
+            }
+            const content = buf.toString('utf8');
+            return pattern.test(content);
+          } catch (e) {
+            // If we can't read the file, exclude it from results
+            console.error(`[skip] Cannot read for grep: ${filePath} — ${e.message}`);
+            return false;
+          }
         });
       }
 
