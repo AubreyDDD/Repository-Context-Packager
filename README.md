@@ -16,6 +16,7 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
 - **Smart File Handling**: Automatically detects and skips binary files
 - **Customizable Scope**: Process entire directories or specific files
 - **Line Numbers**: Optional line numbers display for easier code reference
+- **Content Search**: Filter files by content using regex patterns with `--grep`
 
 ## Installation
 
@@ -68,6 +69,9 @@ repomaster . --recent 30
 # Include line numbers in file content output
 repomaster . -l
 repomaster . --line-numbers
+# Filter files by content pattern (case-insensitive regex search)
+repomaster . --grep "Command"
+repomaster . --grep "import.*React"
 ```
 
 ## Example Output
@@ -107,8 +111,8 @@ package.json
 2: import fs from 'node:fs';
 3: import path from 'node:path';
 4: // ... more code ...
-```
 
 ## Summary
 - Total files: 11
 - Total lines: 619
+```
