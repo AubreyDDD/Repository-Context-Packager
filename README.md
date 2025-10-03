@@ -21,6 +21,8 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
   You can modify the `.repomaster-config.toml` file in your repository to set default options:
 
   ```toml
+  # Sample Config file
+   
   # Output file path - where to write the repository context
   output = 'output.txt'
 
@@ -33,12 +35,11 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
   # List recent modified files (within last 5 days) only
   recent = 5
 
-  # Include line numbers in file content output
+  # Filter files by content pattern "repomaster"
   grep = 'repomaster'
   ```
   - If the config file doesn't exist, it will be ignored
   - Command line arguments override config file settings
-  - Invalid TOML files will cause the tool to exit with an error
   - Unrecognized options are ignored for future extensibility
 
 ## Installation
@@ -54,7 +55,7 @@ npm link
 
 ## Example Usage
 ```bash
-# Package the current directory, Use .gitignore and `-o output.txt` by default (exclude ignored files)
+# Package the current directory, Use .gitignore by default (exclude ignored files)
 repomaster .
 
 # Include all files, ignore .gitignore rules  
