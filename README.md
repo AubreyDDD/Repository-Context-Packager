@@ -147,3 +147,6 @@ package.json
 <a href="https://github.com/whyang9701">
   <img src="https://github.com/whyang9701.png" width="50" height="50" style="border-radius:50%;" />
 </a>
+<a href="https://github.com/slyang08">
+  <img src="https://github.com/slyang08.png" width="50" height="50" style="border-radius:50%;" />
+</a>
