@@ -2,13 +2,13 @@
 output = 'output.txt'
 
 # Include all files, ignore .gitignore rules
-noGitIgnore = false
+# noGitIgnore = false
 
 # Include line numbers in file content output
-lineNumbers = true
+# lineNumbers = true
 
 # List recent modified files (within last 5 days) only
-recent = 5
+# recent
 
 # Include line numbers in file content output
-grep = 'repomaster'
+# grep = ''
