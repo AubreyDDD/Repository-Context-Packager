@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Option } from 'commander';
 import fs from 'node:fs'; 
 import path from 'node:path';
 import { getGitInfoOrNull } from './git-info.js';
@@ -6,6 +6,10 @@ import { collectFiles } from './file-scanner.js';
 import { buildTree, renderTree } from './tree-builder.js';
 import { readFilesAndSummarize, isLikelyBinary } from './content-handler.js';
 import { isBooleanObject } from 'node:util/types';
+import { loadTomlConfig } from './toml-config.js'
+
+// load config from TOML
+const tomlConfig = loadTomlConfig();
 
 const program = new Command();
 
@@ -14,11 +18,11 @@ program
   .description('Repository Context Packager - package repo context for LLMs')
   .version('0.1.0')   // --version / -V
   .argument('<paths...>', 'one or more files/directories (use . for current)') // receive 1+ paths
-  .option('-o, --output <file>', 'output to a file instead of stdout')
-  .option('--no-gitignore', 'do not use .gitignore rules (include all files)')
-  .option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory. \n-r(default 7days), -r [days] could show custom days')
-  .option('-l, --line-numbers', 'include line numbers in file content output')
-  .option('--grep <pattern>', 'only include files containing the specified pattern')
+  .addOption(new Option('-o, --output <file>', 'output to a file instead of stdout').default(tomlConfig.output))
+  .addOption(new Option('--no-gitignore', 'do not use .gitignore rules (include all files)').default(tomlConfig.noGitIgnore))
+  .addOption(new Option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory. \n-r(default 7days), -r [days] could show custom days').default(tomlConfig.recent))
+  .addOption(new Option('-l, --line-numbers', 'include line numbers in file content output').default(tomlConfig.lineNumbers))
+  .addOption(new Option('--grep <pattern>', 'only include files containing the specified pattern').default(tomlConfig.grep))
   .action((paths, options) => {
     // convert to absolute paths
     const absPaths = paths.map(p => path.resolve(p));

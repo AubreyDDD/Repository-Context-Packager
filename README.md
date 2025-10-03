@@ -17,6 +17,29 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
 - **Customizable Scope**: Process entire directories or specific files
 - **Line Numbers**: Optional line numbers display for easier code reference
 - **Content Search**: Filter files by content using regex patterns with `--grep`
+- **Configuration File**: Making some optional features by default
+  You can modify the `.repomaster-config.toml` file in your repository to set default options:
+
+  ```toml
+  # Output file path - where to write the repository context
+  output = 'output.txt'
+
+  # Include all files, ignore .gitignore rules
+  noGitIgnore = false
+
+  # Include line numbers in file content output
+  lineNumbers = true
+
+  # List recent modified files (within last 5 days) only
+  recent = 5
+
+  # Include line numbers in file content output
+  grep = 'repomaster'
+  ```
+  - If the config file doesn't exist, it will be ignored
+  - Command line arguments override config file settings
+  - Invalid TOML files will cause the tool to exit with an error
+  - Unrecognized options are ignored for future extensibility
 
 ## Installation
 
@@ -31,7 +54,7 @@ npm link
 
 ## Example Usage
 ```bash
-# Package the current directory, Use .gitignore by default (exclude ignored files)
+# Package the current directory, Use .gitignore and `-o output.txt` by default (exclude ignored files)
 repomaster .
 
 # Include all files, ignore .gitignore rules  
@@ -69,6 +92,7 @@ repomaster . --recent 30
 # Include line numbers in file content output
 repomaster . -l
 repomaster . --line-numbers
+
 # Filter files by content pattern (case-insensitive regex search)
 repomaster . --grep "Command"
 repomaster . --grep "import.*React"
