@@ -41,7 +41,7 @@ export function collectFiles(absInputs, useGitignore = true) {
     
     if (st.isDirectory()) {
       // If it's a directory, explore all files inside it recursively
-      walkDir(p, out, seen, gitignoreInfo);
+      walkDir(p, out, seen, gitignoreInfo, useGitignore);
     } else if (st.isFile()) {
       // If it's a file and we haven't seen it before, add it to our list
       if (!seen.has(p)) { out.push(p); seen.add(p); }
@@ -54,7 +54,7 @@ export function collectFiles(absInputs, useGitignore = true) {
 }
 
 // explore a directory and all its subdirectories recursively
-function walkDir(dir, out, seen, gitignoreInfo = null) {
+function walkDir(dir, out, seen, gitignoreInfo = null, useGitignore) {
   let entries;  
   try {
     // Try to read all files and folders in this directory
@@ -72,7 +72,7 @@ function walkDir(dir, out, seen, gitignoreInfo = null) {
 
     // Skip certain directories that we don't want to include
     // .git contains Git's internal files, node_modules contains downloaded libraries
-    if (ent.isDirectory?.() && DEFAULT_EXCLUDED_DIRS.has(name)) {
+    if (useGitignore && ent.isDirectory?.() && DEFAULT_EXCLUDED_DIRS.has(name)) {
       continue;  // Skip this directory and move to the next item
     }
     
