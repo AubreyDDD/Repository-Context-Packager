@@ -1,14 +1,8 @@
 import { Command, Option } from 'commander';
-import fs from 'node:fs'; 
-import path from 'node:path';
-import { getGitInfoOrNull } from './git-info.js';
-import { collectFiles } from './file-scanner.js';
-import { buildTree, renderTree } from './tree-builder.js';
-import { readFilesAndSummarize, isLikelyBinary } from './content-handler.js';
-import { isBooleanObject } from 'node:util/types';
-import { loadTomlConfig } from './toml-config.js'
+import { loadTomlConfig } from './toml-config.js';
+import { processRepository } from './repository-processor.js';
 
-// load config from TOML
+// Load configuration from TOML file
 const tomlConfig = loadTomlConfig();
 
 const program = new Command();
@@ -24,117 +18,7 @@ program
   .addOption(new Option('-l, --line-numbers', 'include line numbers in file content output').default(tomlConfig.lineNumbers))
   .addOption(new Option('--grep <pattern>', 'only include files containing the specified pattern').default(tomlConfig.grep))
   .action((paths, options) => {
-    // convert to absolute paths
-    const absPaths = paths.map(p => path.resolve(p));
-
-    // get base directory
-    let baseDir;
-      try {   
-        const st = fs.statSync(absPaths[0]);
-        // if directory, use it; if file, use its parent dir
-        baseDir = st.isDirectory() ? absPaths[0] : path.dirname(absPaths[0]);
-      } catch {
-        console.error(`Error: Path does not exist - ${absPaths[0]}`);
-        process.exit(1);  // Exit with error code 1 when path doesn't exist
-      }
-
-      // get git info if possible
-      const git = getGitInfoOrNull(baseDir);
-      
-      const gitSection = git
-        ? [
-            `- Commit: ${git.commit}`,
-            `- Branch: ${git.branch}`,
-            `- Author: ${git.author}`,
-            `- Date: ${git.date}`
-          ].join('\n')
-        : '- Not a git repository';
-    
-    
-    let filesAbs = collectFiles(absPaths, options.gitignore);
-    
-    // If no valid files were found, exit with error
-    if (filesAbs.length === 0) {
-      // Error messages have already been printed by collectFiles
-      process.exit(1);
-    }
-      // filter by recent if specified
-      if(options.recent){
-        options.recent = isBooleanObject(options.recent) ? 7 : parseInt(options.recent,10) || 7; // default to 7 days if no number provided
-        filesAbs = filesAbs.filter(filePath=>{
-          const fstat = fs.statSync(filePath);
-          fstat.mtimeMs = fstat.mtimeMs || fstat.ctimeMs || 0; // fallback to ctime if mtime is unavailable
-          return fstat.mtimeMs > Date.now() - options.recent * 24 * 60 * 60 * 1000;
-        });
-      }
-
-      // filter by content pattern if specified
-      if (options.grep) {
-        const pattern = new RegExp(options.grep, 'i'); // case-insensitive search
-        filesAbs = filesAbs.filter(filePath => {
-          try {
-            const buf = fs.readFileSync(filePath);
-            // Skip binary files for content search
-            if (isLikelyBinary(buf)) {
-              return false;
-            }
-            const content = buf.toString('utf8');
-            return pattern.test(content);
-          } catch (e) {
-            // If we can't read the file, exclude it from results
-            console.error(`[skip] Cannot read for grep: ${filePath} — ${e.message}`);
-            return false;
-          }
-        });
-      }
-
-       // get directory tree text
-      const filesRel = filesAbs
-        .map(f => path.relative(baseDir, f))
-        .filter(rel => rel && !rel.startsWith('..') && !path.isAbsolute(rel));
-      const treeText = filesRel.length
-        ? renderTree(buildTree(filesRel))
-        : '(empty)';
-
-     // read files and summarize
-      const { sections, stats } = readFilesAndSummarize(filesAbs, baseDir, options.lineNumbers);
-
-    // basic output template
-    const out = [
-      '# Repository Context',
-      '',
-      '## File System Location',
-      baseDir,
-      '',
-      '## Git Info',
-      gitSection,
-      '',
-      '## Structure',
-      '```',
-      treeText,
-      '```',
-      '',
-      '## File Contents',
-      sections.join('\n'),
-      '',
-      '## Summary',
-      `- Total files: ${stats.totalTextFiles}`,
-      `- Total lines: ${stats.totalLines}`,
-      ''
-    ].join('\n');
-
-    // Output to file or stdout based on options
-    if (options.output) {
-      try {
-        fs.writeFileSync(options.output, out, 'utf8');
-        console.log(`Output written to: ${options.output}`);
-      } catch (error) {
-        console.error(`Error writing to file ${options.output}: ${error.message}`);
-        process.exit(1);
-      }
-    } else {
-      process.stdout.write(out);
-    }
+    processRepository(paths, options);
   });
 
  // async parse to allow for future async actions
