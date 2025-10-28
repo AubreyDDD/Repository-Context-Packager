@@ -2,7 +2,7 @@
 output = 'output.txt'
 
 # Include all files, ignore .gitignore rules
-# noGitIgnore = false
+# noGitIgnore = true
 
 # Include line numbers in file content output
 # lineNumbers = true
@@ -11,7 +11,7 @@ output = 'output.txt'
 # recent
 
 # Filter files by content pattern
-# grep = ''
+# grep = 'Todo'
 
 # File Filtering by Extension
 # include = '*.md'
