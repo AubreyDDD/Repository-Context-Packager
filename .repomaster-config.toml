@@ -7,8 +7,11 @@ output = 'output.txt'
 # Include line numbers in file content output
 # lineNumbers = true
 
-# List recent modified files (within last 5 days) only
+# List recent modified files only
 # recent
 
-# Include line numbers in file content output
+# Filter files by content pattern
 # grep = ''
+
+# File Filtering by Extension
+# include = '*.md'

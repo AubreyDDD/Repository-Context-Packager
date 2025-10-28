@@ -17,6 +17,7 @@ program
   .addOption(new Option('-r, --recent [days]', 'only include the most recently (7 days) modified files per directory. \n-r(default 7days), -r [days] could show custom days').default(tomlConfig.recent))
   .addOption(new Option('-l, --line-numbers', 'include line numbers in file content output').default(tomlConfig.lineNumbers))
   .addOption(new Option('--grep <pattern>', 'only include files containing the specified pattern').default(tomlConfig.grep))
+  .addOption(new Option('--include <patterns>', 'only include files matching glob patterns (comma-separated, e.g., "*.js,*.py")').default(tomlConfig.include))
   .action((paths, options) => {
     processRepository(paths, options);
   });

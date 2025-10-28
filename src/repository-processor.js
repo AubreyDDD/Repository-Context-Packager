@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { globbySync } from 'globby';
 import { getGitInfoOrNull } from './git-info.js';
 import { collectFiles } from './file-scanner.js';
 import { buildTree, renderTree } from './tree-builder.js';
@@ -93,6 +94,37 @@ function filterFilesByContent(filesAbs, grepPattern) {
 }
 
 /**
+ * Filter files by glob patterns
+ */
+function filterFilesByGlobPattern(filesAbs, includePatterns, baseDir) {
+  if (!includePatterns) return filesAbs;
+  
+  // Parse comma-separated patterns
+  const patterns = includePatterns.split(',').map(p => p.trim()).filter(Boolean);
+  if (patterns.length === 0) return filesAbs;
+  
+  try {
+    // Use globbySync to find files matching the patterns
+    const matchedFiles = globbySync(patterns, {
+      cwd: baseDir,
+      dot: true,
+      onlyFiles: true,
+      absolute: true,
+      ignore: []
+    });
+    
+    // Create a set of matched absolute paths for quick lookup
+    const matchedSet = new Set(matchedFiles);
+    
+    // Filter to only include files that match the patterns
+    return filesAbs.filter(absPath => matchedSet.has(absPath));
+  } catch (e) {
+    console.error(`[skip] Error processing glob patterns: ${e.message}`);
+    return filesAbs;
+  }
+}
+
+/**
  * Filter files to valid relative paths
  */
 function filterValidRelativePaths(filesAbs, baseDir) {
@@ -105,8 +137,10 @@ function filterValidRelativePaths(filesAbs, baseDir) {
 /**
  * Apply all file filters in a chain
  */
-function applyFileFilters(filesAbs, options) {
+function applyFileFilters(filesAbs, options, baseDir) {
   const filters = [
+    // Glob pattern filter (include)
+    (files) => filterFilesByGlobPattern(files, options.include, baseDir),
     // Recent files filter
     (files) => filterRecentFiles(files, options.recent),
     // Content pattern filter  
@@ -194,8 +228,8 @@ export function processRepository(paths, options) {
     process.exit(1);
   }
   
-  // 5. Apply filters (recent, grep, etc.)
-  filesAbs = applyFileFilters(filesAbs, options);
+  // 5. Apply filters (include, recent, grep, etc.)
+  filesAbs = applyFileFilters(filesAbs, options, baseDir);
   
   // 6. Generate the complete output content
   const output = generateOutput(baseDir, gitSection, filesAbs, options);

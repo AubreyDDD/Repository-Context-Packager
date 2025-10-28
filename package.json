@@ -24,6 +24,7 @@
   "homepage": "https://github.com/AubreyDDD/Repository-Context-Packager#readme",
   "dependencies": {
     "commander": "^14.0.0",
+    "globby": "^15.0.0",
     "ignore": "^7.0.5",
     "toml": "^3.0.0"
   }
