@@ -11,9 +11,9 @@ import { isBooleanObject } from 'node:util/types';
  * Process and validate input paths, return base directory
  */
 function processInputPaths(paths) {
-  const absPaths = paths.map(p => path.resolve(p));
-  
-  try {   
+  const absPaths = paths.map((p) => path.resolve(p));
+
+  try {
     const fileStats = fs.statSync(absPaths[0]);
     // if directory, use it; if file, use its parent dir
     const baseDir = fileStats.isDirectory() ? absPaths[0] : path.dirname(absPaths[0]);
@@ -29,13 +29,13 @@ function processInputPaths(paths) {
  */
 function getFormattedGitInfo(baseDir) {
   const git = getGitInfoOrNull(baseDir);
-  
+
   return git
     ? [
         `- Commit: ${git.commit}`,
         `- Branch: ${git.branch}`,
         `- Author: ${git.author}`,
-        `- Date: ${git.date}`
+        `- Date: ${git.date}`,
       ].join('\n')
     : '- Not a git repository';
 }
@@ -44,10 +44,10 @@ function getFormattedGitInfo(baseDir) {
  * Generic file filter function with error handling
  */
 function createFileFilter(name, condition, filterFn) {
-  return function(filesAbs) {
+  return function (filesAbs) {
     if (!condition) return filesAbs;
-    
-    return filesAbs.filter(filePath => {
+
+    return filesAbs.filter((filePath) => {
       try {
         return filterFn(filePath);
       } catch (e) {
@@ -64,13 +64,13 @@ function createFileFilter(name, condition, filterFn) {
 function filterRecentFiles(filesAbs, recentOption) {
   const days = isBooleanObject(recentOption) ? 7 : parseInt(recentOption, 10) || 7;
   const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
-  
+
   const filter = createFileFilter('recent files', recentOption, (filePath) => {
     const fileStats = fs.statSync(filePath);
     const modifiedTime = fileStats.mtimeMs || fileStats.ctimeMs || 0;
     return modifiedTime > cutoffTime;
   });
-  
+
   return filter(filesAbs);
 }
 
@@ -79,7 +79,7 @@ function filterRecentFiles(filesAbs, recentOption) {
  */
 function filterFilesByContent(filesAbs, grepPattern) {
   const pattern = grepPattern ? new RegExp(grepPattern, 'i') : null;
-  
+
   const filter = createFileFilter('content search', grepPattern, (filePath) => {
     const fileBuffer = fs.readFileSync(filePath);
     // Skip binary files for content search
@@ -89,7 +89,7 @@ function filterFilesByContent(filesAbs, grepPattern) {
     const content = fileBuffer.toString('utf8');
     return pattern.test(content);
   });
-  
+
   return filter(filesAbs);
 }
 
@@ -98,11 +98,14 @@ function filterFilesByContent(filesAbs, grepPattern) {
  */
 function filterFilesByGlobPattern(filesAbs, includePatterns, baseDir) {
   if (!includePatterns) return filesAbs;
-  
+
   // Parse comma-separated patterns
-  const patterns = includePatterns.split(',').map(p => p.trim()).filter(Boolean);
+  const patterns = includePatterns
+    .split(',')
+    .map((p) => p.trim())
+    .filter(Boolean);
   if (patterns.length === 0) return filesAbs;
-  
+
   try {
     // Use globbySync to find files matching the patterns
     const matchedFiles = globbySync(patterns, {
@@ -110,14 +113,14 @@ function filterFilesByGlobPattern(filesAbs, includePatterns, baseDir) {
       dot: true,
       onlyFiles: true,
       absolute: true,
-      ignore: []
+      ignore: [],
     });
-    
+
     // Create a set of matched absolute paths for quick lookup
     const matchedSet = new Set(matchedFiles);
-    
+
     // Filter to only include files that match the patterns
-    return filesAbs.filter(absPath => matchedSet.has(absPath));
+    return filesAbs.filter((absPath) => matchedSet.has(absPath));
   } catch (e) {
     console.error(`[skip] Error processing glob patterns: ${e.message}`);
     return filesAbs;
@@ -128,7 +131,7 @@ function filterFilesByGlobPattern(filesAbs, includePatterns, baseDir) {
  * Filter files to valid relative paths
  */
 function filterValidRelativePaths(filesAbs, baseDir) {
-  return filesAbs.filter(filePath => {
+  return filesAbs.filter((filePath) => {
     const relativePath = path.relative(baseDir, filePath);
     return relativePath && !relativePath.startsWith('..') && !path.isAbsolute(relativePath);
   });
@@ -143,10 +146,10 @@ function applyFileFilters(filesAbs, options, baseDir) {
     (files) => filterFilesByGlobPattern(files, options.include, baseDir),
     // Recent files filter
     (files) => filterRecentFiles(files, options.recent),
-    // Content pattern filter  
-    (files) => filterFilesByContent(files, options.grep)
+    // Content pattern filter
+    (files) => filterFilesByContent(files, options.grep),
   ];
-  
+
   return filters.reduce((files, filter) => filter(files), filesAbs);
 }
 
@@ -156,12 +159,10 @@ function applyFileFilters(filesAbs, options, baseDir) {
 function generateOutput(baseDir, gitSection, filesAbs, options) {
   // Filter files to valid relative paths for tree generation
   const validFiles = filterValidRelativePaths(filesAbs, baseDir);
-  
+
   // Generate directory tree
-  const filesRel = validFiles.map(f => path.relative(baseDir, f));
-  const treeText = filesRel.length
-    ? renderTree(buildTree(filesRel))
-    : '(empty)';
+  const filesRel = validFiles.map((f) => path.relative(baseDir, f));
+  const treeText = filesRel.length ? renderTree(buildTree(filesRel)) : '(empty)';
 
   // Read files and summarize (use original filesAbs for content processing)
   const { sections, stats } = readFilesAndSummarize(filesAbs, baseDir, options.lineNumbers);
@@ -187,7 +188,7 @@ function generateOutput(baseDir, gitSection, filesAbs, options) {
     '## Summary',
     `- Total files: ${stats.totalTextFiles}`,
     `- Total lines: ${stats.totalLines}`,
-    ''
+    '',
   ].join('\n');
 }
 
@@ -215,25 +216,25 @@ function writeOutput(content, outputPath) {
 export function processRepository(paths, options) {
   // 1. Process and validate input paths
   const { absPaths, baseDir } = processInputPaths(paths);
-  
+
   // 2. Get Git information
   const gitSection = getFormattedGitInfo(baseDir);
-  
+
   // 3. Collect files from the specified paths
   let filesAbs = collectFiles(absPaths, options.gitignore);
-  
+
   // 4. Check if any files were found
   if (filesAbs.length === 0) {
     console.error('No valid files found');
     process.exit(1);
   }
-  
+
   // 5. Apply filters (include, recent, grep, etc.)
   filesAbs = applyFileFilters(filesAbs, options, baseDir);
-  
+
   // 6. Generate the complete output content
   const output = generateOutput(baseDir, gitSection, filesAbs, options);
-  
+
   // 7. Write output to file or stdout
   writeOutput(output, options.output);
 }

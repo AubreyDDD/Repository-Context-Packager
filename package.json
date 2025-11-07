@@ -26,5 +26,8 @@
     "commander": "^14.0.0",
     "globby": "^15.0.0",
     "toml": "^3.0.0"
+  },
+  "devDependencies": {
+    "prettier": "3.6.2"
   }
 }

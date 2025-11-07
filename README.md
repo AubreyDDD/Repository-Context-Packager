@@ -1,4 +1,5 @@
 # Repository-Context-Packager （repomaster）
+
 **RepoMaster** is a CLI tool that analyzes local git repositories and creates a text file containing repository content optimized for sharing with LLMs.
 
 Instead of copy-pasting code file by file, RepoMaster automatically collects:
@@ -22,7 +23,7 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
 
   ```toml
   # Sample Config file
-   
+
   # Output file path - where to write the repository context
   output = 'output.txt'
 
@@ -38,6 +39,7 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
   # Filter files by content pattern "repomaster"
   grep = 'repomaster'
   ```
+
   - If the config file doesn't exist, it will be ignored
   - Command line arguments override config file settings
   - Unrecognized options are ignored for future extensibility
@@ -54,11 +56,12 @@ npm link
 ```
 
 ## Example Usage
+
 ```bash
 # Package the current directory, Use .gitignore by default (exclude ignored files)
 repomaster .
 
-# Include all files, ignore .gitignore rules  
+# Include all files, ignore .gitignore rules
 repomaster . --no-gitignore
 
 # Package a specific repo directory
@@ -101,7 +104,7 @@ repomaster . --grep "import.*React"
 
 ## Example Output
 
-```bash
+````bash
 # Repository Context
 
 ## File System Location
@@ -140,7 +143,7 @@ package.json
 ## Summary
 - Total files: 11
 - Total lines: 619
-```
+````
 
 ## Contributors
 

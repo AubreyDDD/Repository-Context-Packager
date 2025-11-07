@@ -1,5 +1,5 @@
-import fs from 'node:fs';    
-import path from 'node:path'; 
+import fs from 'node:fs';
+import path from 'node:path';
 
 const MAX_FILE_SIZE = 16 * 1024;
 
@@ -7,19 +7,19 @@ const MAX_FILE_SIZE = 16 * 1024;
 const LANGUAGE_MAP = {
   // JavaScript/TypeScript
   '.js': 'javascript',
-  '.jsx': 'javascript', 
+  '.jsx': 'javascript',
   '.ts': 'typescript',
   '.tsx': 'typescript',
-  
+
   // Web
   '.html': 'html',
   '.css': 'css',
-  
+
   // Data formats
   '.json': 'json',
   '.yaml': 'yaml',
   '.yml': 'yaml',
-  
+
   // Popular programming languages
   '.py': 'python',
   '.java': 'java',
@@ -28,28 +28,28 @@ const LANGUAGE_MAP = {
   '.cs': 'csharp',
   '.php': 'php',
   '.go': 'go',
-  
+
   // Shell & scripts
   '.sh': 'bash',
-  
+
   // Documentation
   '.md': 'markdown',
-  
+
   // Database
-  '.sql': 'sql'
+  '.sql': 'sql',
 };
 
 // Function to get language identifier from file path
 function getLanguageFromPath(filePath) {
   const basename = path.basename(filePath).toLowerCase();
-  
+
   // Handle special files
   if (basename === 'package.json') return 'json';
   if (basename === 'dockerfile') return 'dockerfile';
-  
+
   // Get file extension
   const ext = path.extname(filePath).toLowerCase();
-  
+
   // Return mapped language or use extension without dot as fallback
   return LANGUAGE_MAP[ext] || ext.slice(1);
 }
@@ -57,44 +57,48 @@ function getLanguageFromPath(filePath) {
 // Function that tries to detect if a file contains binary data (not human-readable text)
 // Binary files include images, videos, executable programs, etc.
 export function isLikelyBinary(buf) {
-  const len = Math.min(buf.length, 8000);  // Check at most the first 8000 bytes
-  if (len === 0) return false;              // Empty files are not binary
-  
-  let suspicious = 0;  // Counter for suspicious (non-text) characters
-  
+  const len = Math.min(buf.length, 8000); // Check at most the first 8000 bytes
+  if (len === 0) return false; // Empty files are not binary
+
+  let suspicious = 0; // Counter for suspicious (non-text) characters
+
   // Go through each byte in the file
   for (let i = 0; i < len; i++) {
-    const b = buf[i];  // Get the byte value (0-255)
-    
+    const b = buf[i]; // Get the byte value (0-255)
+
     if (b === 0) return true; // Null bytes (0) almost always mean binary data
-    
+
     // Count characters that are not typical text characters
     // 9=tab, 10=newline, 13=carriage return, 32-126=printable ASCII characters
     if (b !== 9 && b !== 10 && b !== 13 && (b < 32 || b > 126)) suspicious++;
   }
-  
+
   // If more than 30% of characters are suspicious, it's probably binary
   return suspicious / len > 0.3;
 }
 
 // Function that formats a file's content into a nice section for the final output
 // Creates a header with the file path and wraps the content in code blocks with syntax highlighting
-export function renderFileSection(relPath, content, truncated, language = '', withLineNumbers = false) {
+export function renderFileSection(
+  relPath,
+  content,
+  truncated,
+  language = '',
+  withLineNumbers = false
+) {
   let formattedContent = content;
-  
+
   if (withLineNumbers) {
     const lines = content.split(/\r?\n/);
-    formattedContent = lines
-      .map((line, index) => `${(index + 1).toString()}: ${line}`)
-      .join('\n');
+    formattedContent = lines.map((line, index) => `${(index + 1).toString()}: ${line}`).join('\n');
   }
-  
+
   return [
     `\n### File: ${relPath}\n`,
     `\`\`\`${language}`,
     formattedContent,
     '```',
-    truncated ? '\n> [truncated]\n' : ''
+    truncated ? '\n> [truncated]\n' : '',
   ].join('\n');
 }
 
@@ -129,8 +133,8 @@ export function readFilesAndSummarize(filesAbs, baseDir, withLineNumbers = false
     }
 
     // Prepare variables for handling file content
-    let truncated = false;  // Flag to track if we had to cut off the file
-    let content;           
+    let truncated = false; // Flag to track if we had to cut off the file
+    let content;
 
     // Check if the file is too large to process completely
     if (buf.length > MAX_FILE_SIZE) {
@@ -142,10 +146,10 @@ export function readFilesAndSummarize(filesAbs, baseDir, withLineNumbers = false
     }
 
     const rel = path.relative(baseDir, fileAbs) || path.basename(fileAbs);
-    
+
     // Get the language type for syntax highlighting
     const language = getLanguageFromPath(fileAbs);
-    
+
     // Count how many lines are in this file (split by line breaks)
     const lineCount = content.split(/\r?\n/).length;
 
@@ -159,6 +163,6 @@ export function readFilesAndSummarize(filesAbs, baseDir, withLineNumbers = false
   // Return both the formatted content sections and the statistics
   return {
     sections,
-    stats: { totalTextFiles, totalLines, skippedBinary, truncatedFiles }
+    stats: { totalTextFiles, totalLines, skippedBinary, truncatedFiles },
   };
 }
