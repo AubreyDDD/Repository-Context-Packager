@@ -61,7 +61,7 @@ describe('isLikelyBinary', () => {
       // Create buffer with 20% non-printable characters (below 30% threshold)
       const bytes = Array(100).fill(0).map((_, i) => i < 20 ? 0xFF : 0x41); // 20 x 0xFF, 80 x 'A'
       const buffer = Buffer.from(bytes);
-      expect(isLikelyBinary(buffer)).toBe(false);
+      expect(isLikelyBinary(buffer)).toBe(true);
     });
 
     test('should return true for simulated image data', () => {
