@@ -40,12 +40,12 @@ const LANGUAGE_MAP = {
 };
 
 // Function to get language identifier from file path
-function getLanguageFromPath(filePath) {
+export function getLanguageFromPath(filePath) {
   const basename = path.basename(filePath).toLowerCase();
 
   // Handle special files
   if (basename === 'package.json') return 'json';
-  if (basename === 'dockerfile') return 'dockerfile';
+  else if (basename === 'dockerfile') return 'dockerfile';
 
   // Get file extension
   const ext = path.extname(filePath).toLowerCase();
