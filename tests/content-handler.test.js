@@ -1,4 +1,4 @@
-import { isLikelyBinary } from '../src/content-handler.js';
+import { isLikelyBinary, getLanguageFromPath } from '../src/content-handler.js';
 
 describe('isLikelyBinary', () => {
   describe('when given empty buffer', () => {
@@ -147,3 +147,25 @@ describe('isLikelyBinary', () => {
     });
   });
 });
+describe('getLanguageFromPath', () => {
+  test('package.json should return json', () => {
+    let lang = getLanguageFromPath('package.json');
+    expect(lang).toBe('json');
+  });
+
+  test('Dockerfile should return dockerfile', () => {
+    lang = getLanguageFromPath('Dockerfile');
+    expect(lang).toBe('dockerfile');
+  });
+
+  test('.ts files should return typescript', () => {
+    lang = getLanguageFromPath('main.ts');
+    expect(lang).toBe('typescript');
+  });
+
+  test('.html files should return html', () => {
+    lang = getLanguageFromPath('index.html');
+    expect(lang).toBe('html');
+  });
+
+})
