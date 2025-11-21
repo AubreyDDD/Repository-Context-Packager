@@ -1,6 +1,6 @@
 {
   "name": "repository-context-packager",
-  "version": "0.9.0",
+  "version": "1.0.0",
   "description": "CLI tool that analyzes local git repositories and creates a text file containing repository content optimized for sharing with LLMs.",
   "bin": {
     "repomaster": "bin/repomaster.js"
