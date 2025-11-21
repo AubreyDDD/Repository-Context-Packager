@@ -46,7 +46,24 @@ Instead of copy-pasting code file by file, RepoMaster automatically collects:
 
 ## Installation
 
-Clone the repository and install globally with `npm`:
+### From npm (Recommended)
+
+Install globally via npm:
+
+```bash
+npm install -g repository-context-packager
+```
+
+After installation, the `repomaster` command will be available globally:
+
+```bash
+repomaster --version
+repomaster --help
+```
+
+### From Source
+
+Clone the repository and install locally:
 
 ```bash
 git clone https://github.com/AubreyDDD/Repository-Context-Packager.git
@@ -153,3 +170,31 @@ package.json
 <a href="https://github.com/slyang08">
   <img src="https://github.com/slyang08.png" width="50" height="50" style="border-radius:50%;" />
 </a>
+
+## Version History
+
+### v0.9.0 (Pre-release) - November 21, 2025
+
+First pre-release version published to npm for testing.
+
+**Features:**
+- ✅ CLI tool for analyzing git repositories
+- ✅ Generates text output optimized for LLMs
+- ✅ Supports TOML configuration files
+- ✅ Tree structure visualization
+- ✅ Git information extraction
+- ✅ Binary file detection
+- ✅ Gitignore integration
+- ✅ Content search with `--grep`
+- ✅ Recent files filter with `--recent`
+- ✅ Line numbers support
+
+**Testing & Quality:**
+- 76 test cases passing
+- Code coverage implemented
+- CI/CD with GitHub Actions (lint + tests)
+- ESLint for code quality
+
+## License
+
+MIT License - see LICENSE file for details

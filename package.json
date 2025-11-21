@@ -1,26 +1,45 @@
 {
   "name": "repository-context-packager",
-  "version": "0.1.0",
+  "version": "0.9.0",
   "description": "CLI tool that analyzes local git repositories and creates a text file containing repository content optimized for sharing with LLMs.",
   "bin": {
     "repomaster": "bin/repomaster.js"
   },
-  "main": "index.js",
+  "main": "src/cli.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "start": "node bin/repomaster.js",
-    "lint": "eslint \"./src/**/*.js\""
+    "lint": "eslint \"./src/**/*.js\"",
+    "prepublishOnly": "npm test && npm run lint"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/AubreyDDD/Repository-Context-Packager.git"
   },
-  "keywords": [],
+  "keywords": [
+    "cli",
+    "git",
+    "repository",
+    "llm",
+    "ai",
+    "context",
+    "tool",
+    "developer-tools"
+  ],
   "author": "Aubrey Du",
   "license": "MIT",
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "type": "module",
   "bugs": {
     "url": "https://github.com/AubreyDDD/Repository-Context-Packager/issues"

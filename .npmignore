@@ -1,0 +1,33 @@
+# Test files
+tests/
+*.test.js
+coverage/
+
+# Development files
+.devcontainer/
+.github/
+.eslintrc.json
+.prettierrc
+.vscode/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Build artifacts
+node_modules/
+.DS_Store
+*.log
+
+# Git files
+.git/
+.gitignore
+
+# CI/CD files
+CI_CD_BLOG.md
+PR_DESCRIPTION.md
+
+# Development outputs
+output.txt
+output.xml
